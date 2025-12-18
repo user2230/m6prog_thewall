@@ -4,27 +4,10 @@ require_once '../source/dataclasses/Message.php';
 require_once '../source/views/message_view.php';
 require_once '../source/db/database.php';
  
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!empty($_POST['name']) && !empty($_POST['bericht'])) {
-        $conn = get_db_connection();
-        
-        $name = $_POST['name'];
-        $bericht = $_POST['bericht'];
-        
-        // Use prepared statements to prevent SQL injection
-        $stmt = $conn->prepare("INSERT INTO user (name, bericht) VALUES (?, ?)");
-        $stmt->bind_param("ss", $name, $bericht);
-        
-        $stmt->execute();
-        
-        $stmt->close();
-        $conn->close();
-        
-        // Redirect to the same page to prevent form resubmission on refresh
-        header("Location: index.php");
-        exit;
-    }
+    require_once '../source/controller/PostMessageController.php';
+    $ctrl = new PostMessageController();
+    $ctrl->postMessage();
 }
  
 $conn = get_db_connection();
