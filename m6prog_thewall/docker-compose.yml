@@ -1,0 +1,42 @@
+version: '3.8'
+ 
+services:
+  php:
+    image: wodby/php:latest
+    container_name: prog_m6_thewall_php
+    volumes:
+      - './html/:/var/www/html'
+ 
+  nginx:
+    image: nginx:latest
+    ports:
+      - "81:80"
+    volumes:
+      - './html/:/var/www/html'
+      - './docker/nginx/:/etc/nginx/conf.d'
+    depends_on:
+      - php
+     
+  thewall-db:
+    image: mysql:latest
+    container_name: prog_m6_thewall_db
+    environment:
+      MYSQL_DATABASE: '${DB_SCHEMA_NAME}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ROOT_PASSWORD: '${DB_ROOT_PASSWORD}'
+    ports:
+      - 3357:3306
+    volumes:
+    - ./docker/sql/:/docker-entrypoint-initdb.d
+ 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - "8806:80"
+    environment:
+      PMA_HOST: '${DB_HOST}'
+      PMA_USER: '${DB_USERNAME}'
+      PMA_PASSWORD: '${DB_PASSWORD}'
+    depends_on:
+      - thewall-db
